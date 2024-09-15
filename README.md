@@ -1,12 +1,13 @@
 # Resume PDF Parser
 
-This is a Node.js application that allows users to upload LinkedIn PDF resumes, which are then parsed and converted into HTML format using the Gemini API. The application uses Express.js for server-side logic and Multer for handling file uploads. The HTML content is styled using custom CSS for a better user experience.
+This application allows users to upload LinkedIn PDF resumes, which are then parsed and converted into HTML format using the Gemini API. The application uses Express.js for server-side logic and Multer for handling file uploads.
 
 ## Features
 
 - Upload PDF files through a web interface.
 - Parse the content of the uploaded PDF resumes.
 - Convert the parsed content into an HTML document.
+- See the converted HTML resume.
 - Download the converted HTML resume.
 
 ## Technologies Used
@@ -18,14 +19,13 @@ This is a Node.js application that allows users to upload LinkedIn PDF resumes, 
 - **Axios**: HTTP client for making requests to the Gemini API.
 - **Gemini API**: API used to convert resume text into HTML format.
 - **HTML/CSS**: Used for building and styling the user interface.
-
+- **Vercel**: Used to deploy the application.
 ## Setup and Installation
 
 1. **Clone the Repository**
 
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone https://github.com/TusharKhandelwal95/resume_pdf_to_html.git
 
 2. **Install dependencies**
 
