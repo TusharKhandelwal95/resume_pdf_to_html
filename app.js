@@ -2,7 +2,6 @@ const express = require('express');
 const multer = require('multer');
 const pdf = require('pdf-parse');
 const path = require('path');
-const fs = require('fs');
 const axios = require('axios');
 require('dotenv').config();
 
@@ -15,6 +14,9 @@ const upload = multer({ storage: storage });
 
 // Serve static files (like HTML)
 app.use(express.static('public'));
+
+// Store HTML content temporarily
+let htmlContent = '';
 
 // Define a route for the root path
 app.get('/', (req, res) => {
@@ -35,24 +37,46 @@ app.post('/upload', upload.single('pdf'), async (req, res) => {
         const geminiResponse = await sendToGemini(data.text);
 
         // Format the response into HTML content
-        const htmlContent = formatGeminiResponse(geminiResponse);
+        htmlContent = formatGeminiResponse(geminiResponse);
 
-        // Path to save the HTML file
-        const htmlFilePath = path.join(__dirname, 'public', 'resume.html');
+        // Send the HTML content as the response
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Converted Resume</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        padding: 20px;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>Your Converted Resume</h1>
+                <div>${htmlContent}</div>
+                <a href="/download" download="resume.html">Download Resume</a>
+            </body>
+            </html>
+        `);
 
-        // Write the HTML content to a file
-        fs.writeFileSync(htmlFilePath, htmlContent);
-
-        // Send the HTML file for download
-        res.download(htmlFilePath, 'resume.html', (err) => {
-            if (err) {
-                console.error('Error sending file:', err);
-                res.status(500).send('Error sending file.');
-            }
-        });
     } catch (err) {
         res.status(500).send('Error processing request: ' + err.message);
     }
+});
+
+// Route to handle downloading the HTML file
+app.get('/download', (req, res) => {
+    if (!htmlContent) {
+        return res.status(404).send('No content available for download.');
+    }
+
+    // Send the HTML content for download
+    res.setHeader('Content-disposition', 'attachment; filename=resume.html');
+    res.setHeader('Content-type', 'text/html');
+    res.send(htmlContent);
 });
 
 // Function to send parsed text to the Gemini API
